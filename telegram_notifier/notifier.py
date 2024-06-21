@@ -4,6 +4,7 @@ import requests
 import time
 import os
 from enum import Enum
+import importlib.resources as pkg_resources
 
 class NotifierStatus(Enum):
     INITIALIZED = "initialized"
@@ -12,11 +13,15 @@ class NotifierStatus(Enum):
     ERROR = "error"
 
 class Notifier:
-    def __init__(self, simulation_name, tokens: dict = None, env_file="./.env"):
+    def __init__(self, simulation_name, tokens: dict = None, env_file=None):
         if tokens is not None:
             self.bot_token = tokens.get("BOT_TOKEN")
             self.chat_id = tokens.get("CHAT_ID")
         else:
+            if env_file is None:
+                with pkg_resources.path(__package__, '.env') as path:
+                    env_file = str(path)
+
             with open(env_file) as f:
                 for line in f:
                     if line.strip() and not line.startswith('#'):
@@ -35,7 +40,7 @@ class Notifier:
 
     def send_message(self, message):
         url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
-        payload = {"chat_id": self.chat_id, "text": message}
+        payload = {"chat_id": self.chat_id, "text": message, "parse_mode": "Markdown"}
         response = requests.post(url, json=payload)
         return response.json()
 
@@ -44,7 +49,7 @@ class Notifier:
         self.send_message(message)
 
     def notify_simulation_finished(self, duration):
-        message = f"Simulation : {self.simulation_name} has finished successfully! Duration: {duration:.2f} seconds."
+        message = f"Simulation : {self.simulation_name} has finished successfully! Duration: {duration:.1f} seconds."
         self.send_message(message)
 
     def notify_simulation_error(self, error_message):

@@ -9,6 +9,10 @@ setup(
     install_requires=[
         'requests'
     ],
+    include_package_data=True,
+    data_files=[
+        ('telegram_notifier', ['telegram_notifier/.env']),
+    ],
     author='Matteo Vilucchio',
     author_email='your.email@example.com',
     description='A package to notify via Telegram when a simulation starts and finishes.',

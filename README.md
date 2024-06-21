@@ -7,7 +7,7 @@ This is a simple Telegram bot that sends notifications to a Telegram chat.
 1. Clone the repository
 2. Install the requirements
 3. Create a Telegram bot and get both the bot token and the chat id
-4. Create a `.env` file in the main directoryy with the following content:
+4. Create a `.env` file in the `telegram_notifier` folder with the following content:
 ```
 CHAT_ID=<your_chat_id>
 BOT_TOKEN=<your_bot_token>

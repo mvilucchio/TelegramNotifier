@@ -44,22 +44,25 @@ class Notifier:
         response = requests.post(url, json=payload)
         return response.json()
 
-    def notify_simulation_started(self):
+    def start_notification(self):
         message = f"Simulation : {self.simulation_name} has started."
         self.send_message(message)
 
-    def notify_simulation_finished(self, duration):
-        message = f"Simulation : {self.simulation_name} has finished successfully! Duration: {duration:.1f} seconds."
+    def finish_notification(self, duration=None):
+        if duration is None:
+            message = f"Simulation : {self.simulation_name} has finished successfully!"
+        else:
+            message = f"Simulation : {self.simulation_name} has finished successfully! Duration: {duration:.1f} seconds."
         self.send_message(message)
 
-    def notify_simulation_error(self, error_message):
+    def error_notificaiton(self, error_message):
         message = f"Simulation : {self.simulation_name} encountered an error: {error_message}"
         self.send_message(message)
 
     def __enter__(self):
         self.status = NotifierStatus.STARTED
         self.start_time = time.time()
-        self.notify_simulation_started()
+        self.start_notification()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -68,8 +71,8 @@ class Notifier:
         if exc_type is not None:
             self.status = NotifierStatus.ERROR
             self.error_message = str(exc_val)
-            self.notify_simulation_error(self.error_message)
+            self.error_notificaiton(self.error_message)
         else:
             self.status = NotifierStatus.FINISHED
-            self.notify_simulation_finished(duration)
+            self.finish_notification(duration)
         return self.exception_propagation
